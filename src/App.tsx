@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Product, Category, Transaction } from './types';
 import PremiumPOS from './components/pos/PremiumPOS';
 import PremiumTransactions from './components/transactions/PremiumTransactions';
+import PremiumProducts from './components/products/PremiumProducts';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
@@ -248,12 +249,18 @@ function App() {
               <PremiumPOS products={products} categories={categories} />
             ) : currentView === 'transactions' ? (
               <PremiumTransactions transactions={sampleTransactions} />
+            ) : currentView === 'products' ? (
+              <PremiumProducts 
+                products={products}
+                categories={categories}
+                onUpdateProducts={setProducts}
+                onUpdateCategories={setCategories}
+              />
             ) : (
               <>
                 <div className="mb-8">
                   <h2 className="text-3xl font-semibold text-text-primary mb-2 capitalize">{currentView}</h2>
                   <p className="text-text-secondary">
-                    {currentView === 'products' && 'Manage your product catalog'}
                     {currentView === 'inventory' && 'Track stock levels and adjustments'}
                     {currentView === 'customers' && 'Manage customer information'}
                     {currentView === 'devices' && 'Configure hardware devices'}
