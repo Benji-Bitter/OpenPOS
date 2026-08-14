@@ -20,6 +20,23 @@ export default {
           800: '#1B3597',
           900: '#0C2176',
         },
+        background: {
+          DEFAULT: '#F7F8FA',
+        },
+        surface: {
+          primary: 'rgba(255, 255, 255, 0.70)',
+          secondary: 'rgba(255, 255, 255, 0.50)',
+        },
+        border: {
+          DEFAULT: 'rgba(0, 0, 0, 0.08)',
+        },
+        text: {
+          primary: '#111318',
+          secondary: '#6B7280',
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
       },
     },
   },
