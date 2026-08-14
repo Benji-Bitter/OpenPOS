@@ -8,7 +8,7 @@ mod receipt;
 mod transaction;
 
 use database::Database;
-use database::models::{Transaction, TransactionItem, TransactionStatus};
+use database::models::{Transaction, TransactionItem, TransactionStatus, Product, Category, Customer};
 use receipt::engine::ReceiptEngine;
 use receipt::template::ReceiptTemplate;
 
@@ -213,6 +213,313 @@ fn parse_status(status_str: &str) -> TransactionStatus {
     }
 }
 
+// Product commands
+#[tauri::command]
+fn get_products(db: tauri::State<'_, Database>) -> Result<Vec<Product>, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, name, description, price_cents, category_id, sku, barcode, 
+                tax_rate_cents, stock_quantity, created_at, updated_at 
+         FROM products"
+    ).map_err(|e| e.to_string())?;
+
+    let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+    let mut products = Vec::new();
+
+    while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+        products.push(Product {
+            id: Some(row.get(0).map_err(|e| e.to_string())?),
+            name: row.get(1).map_err(|e| e.to_string())?,
+            description: row.get(2).map_err(|e| e.to_string())?,
+            price_cents: row.get(3).map_err(|e| e.to_string())?,
+            category_id: row.get(4).map_err(|e| e.to_string())?,
+            sku: row.get(5).map_err(|e| e.to_string())?,
+            barcode: row.get(6).map_err(|e| e.to_string())?,
+            tax_rate_cents: row.get(7).map_err(|e| e.to_string())?,
+            stock_quantity: row.get(8).map_err(|e| e.to_string())?,
+            created_at: row.get(9).map_err(|e| e.to_string())?,
+            updated_at: row.get(10).map_err(|e| e.to_string())?,
+        });
+    }
+
+    Ok(products)
+}
+
+#[tauri::command]
+fn create_product(product: Product, db: tauri::State<'_, Database>) -> Result<Product, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "INSERT INTO products (name, description, price_cents, category_id, sku, barcode, 
+                            tax_rate_cents, stock_quantity, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+        [
+            &product.name,
+            product.description.as_deref().unwrap_or(""),
+            &(product.price_cents.to_string()),
+            &product.category_id.map(|id| id.to_string()).unwrap_or_default(),
+            product.sku.as_deref().unwrap_or(""),
+            product.barcode.as_deref().unwrap_or(""),
+            &(product.tax_rate_cents.to_string()),
+            &(product.stock_quantity.to_string()),
+            &(product.created_at.to_string()),
+            &(product.updated_at.to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    let id = conn.last_insert_rowid();
+    let mut created_product = product.clone();
+    created_product.id = Some(id);
+
+    Ok(created_product)
+}
+
+#[tauri::command]
+fn update_product(product: Product, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "UPDATE products SET name = ?1, description = ?2, price_cents = ?3, category_id = ?4,
+                            sku = ?5, barcode = ?6, tax_rate_cents = ?7, stock_quantity = ?8, updated_at = ?9
+         WHERE id = ?10",
+        [
+            &product.name,
+            product.description.as_deref().unwrap_or(""),
+            &(product.price_cents.to_string()),
+            &product.category_id.map(|id| id.to_string()).unwrap_or_default(),
+            product.sku.as_deref().unwrap_or(""),
+            product.barcode.as_deref().unwrap_or(""),
+            &(product.tax_rate_cents.to_string()),
+            &(product.stock_quantity.to_string()),
+            &(product.updated_at.to_string()),
+            &(product.id.unwrap().to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+fn delete_product(id: i64, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute("DELETE FROM products WHERE id = ?1", [&id])
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+// Category commands
+#[tauri::command]
+fn get_categories(db: tauri::State<'_, Database>) -> Result<Vec<Category>, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, name, description, created_at, updated_at FROM categories"
+    ).map_err(|e| e.to_string())?;
+
+    let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+    let mut categories = Vec::new();
+
+    while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+        categories.push(Category {
+            id: Some(row.get(0).map_err(|e| e.to_string())?),
+            name: row.get(1).map_err(|e| e.to_string())?,
+            description: row.get(2).map_err(|e| e.to_string())?,
+            created_at: row.get(3).map_err(|e| e.to_string())?,
+            updated_at: row.get(4).map_err(|e| e.to_string())?,
+        });
+    }
+
+    Ok(categories)
+}
+
+#[tauri::command]
+fn create_category(category: Category, db: tauri::State<'_, Database>) -> Result<Category, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "INSERT INTO categories (name, description, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4)",
+        [
+            &category.name,
+            category.description.as_deref().unwrap_or(""),
+            &(category.created_at.to_string()),
+            &(category.updated_at.to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    let id = conn.last_insert_rowid();
+    let mut created_category = category.clone();
+    created_category.id = Some(id);
+
+    Ok(created_category)
+}
+
+#[tauri::command]
+fn update_category(category: Category, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "UPDATE categories SET name = ?1, description = ?2, updated_at = ?3 WHERE id = ?4",
+        [
+            &category.name,
+            category.description.as_deref().unwrap_or(""),
+            &(category.updated_at.to_string()),
+            &(category.id.unwrap().to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+fn delete_category(id: i64, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute("DELETE FROM categories WHERE id = ?1", [&id])
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+// Customer commands
+#[tauri::command]
+fn get_customers(db: tauri::State<'_, Database>) -> Result<Vec<Customer>, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, name, email, phone, address, notes, created_at, updated_at FROM customers"
+    ).map_err(|e| e.to_string())?;
+
+    let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+    let mut customers = Vec::new();
+
+    while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+        customers.push(Customer {
+            id: Some(row.get(0).map_err(|e| e.to_string())?),
+            name: row.get(1).map_err(|e| e.to_string())?,
+            email: row.get(2).map_err(|e| e.to_string())?,
+            phone: row.get(3).map_err(|e| e.to_string())?,
+            address: row.get(4).map_err(|e| e.to_string())?,
+            notes: row.get(5).map_err(|e| e.to_string())?,
+            created_at: row.get(6).map_err(|e| e.to_string())?,
+            updated_at: row.get(7).map_err(|e| e.to_string())?,
+        });
+    }
+
+    Ok(customers)
+}
+
+#[tauri::command]
+fn create_customer(customer: Customer, db: tauri::State<'_, Database>) -> Result<Customer, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "INSERT INTO customers (name, email, phone, address, notes, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+        [
+            &customer.name,
+            customer.email.as_deref().unwrap_or(""),
+            customer.phone.as_deref().unwrap_or(""),
+            customer.address.as_deref().unwrap_or(""),
+            customer.notes.as_deref().unwrap_or(""),
+            &(customer.created_at.to_string()),
+            &(customer.updated_at.to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    let id = conn.last_insert_rowid();
+    let mut created_customer = customer.clone();
+    created_customer.id = Some(id);
+
+    Ok(created_customer)
+}
+
+#[tauri::command]
+fn update_customer(customer: Customer, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute(
+        "UPDATE customers SET name = ?1, email = ?2, phone = ?3, address = ?4, notes = ?5, updated_at = ?6 WHERE id = ?7",
+        [
+            &customer.name,
+            customer.email.as_deref().unwrap_or(""),
+            customer.phone.as_deref().unwrap_or(""),
+            customer.address.as_deref().unwrap_or(""),
+            customer.notes.as_deref().unwrap_or(""),
+            &(customer.updated_at.to_string()),
+            &(customer.id.unwrap().to_string()),
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[tauri::command]
+fn delete_customer(id: i64, db: tauri::State<'_, Database>) -> Result<(), String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+    
+    conn.execute("DELETE FROM customers WHERE id = ?1", [&id])
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+// Transaction list command
+#[tauri::command]
+fn get_all_transactions(db: tauri::State<'_, Database>) -> Result<Vec<Transaction>, String> {
+    let db = db.inner().clone();
+    let conn = db.get_connection().lock().unwrap();
+
+    let mut stmt = conn.prepare(
+        "SELECT id, transaction_id, provider_transaction_id, amount_cents, currency,
+                payment_provider, payment_method, status, terminal_id, customer_id,
+                tax_cents, discount_cents, subtotal_cents, receipt_data, cashier_id, created_at, updated_at
+         FROM transactions ORDER BY created_at DESC"
+    ).map_err(|e| e.to_string())?;
+
+    let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
+    let mut transactions = Vec::new();
+
+    while let Some(row) = rows.next().map_err(|e| e.to_string())? {
+        transactions.push(Transaction {
+            id: Some(row.get(0).map_err(|e| e.to_string())?),
+            transaction_id: row.get(1).map_err(|e| e.to_string())?,
+            provider_transaction_id: row.get(2).map_err(|e| e.to_string())?,
+            amount_cents: row.get(3).map_err(|e| e.to_string())?,
+            currency: row.get(4).map_err(|e| e.to_string())?,
+            payment_provider: row.get(5).map_err(|e| e.to_string())?,
+            payment_method: row.get(6).map_err(|e| e.to_string())?,
+            status: parse_status(&row.get::<_, String>(7).map_err(|e| e.to_string())?),
+            terminal_id: row.get(8).map_err(|e| e.to_string())?,
+            customer_id: row.get(9).map_err(|e| e.to_string())?,
+            tax_cents: row.get(10).map_err(|e| e.to_string())?,
+            discount_cents: row.get(11).map_err(|e| e.to_string())?,
+            subtotal_cents: row.get(12).map_err(|e| e.to_string())?,
+            receipt_data: row.get(13).map_err(|e| e.to_string())?,
+            cashier_id: row.get(14).map_err(|e| e.to_string())?,
+            created_at: row.get(15).map_err(|e| e.to_string())?,
+            updated_at: row.get(16).map_err(|e| e.to_string())?,
+        });
+    }
+
+    Ok(transactions)
+}
+
 fn main() {
     let db = Database::new(
         database::get_database_path()
@@ -229,6 +536,19 @@ fn main() {
             update_transaction_status,
             add_transaction_item,
             get_transaction_items,
+            get_all_transactions,
+            get_products,
+            create_product,
+            update_product,
+            delete_product,
+            get_categories,
+            create_category,
+            update_category,
+            delete_category,
+            get_customers,
+            create_customer,
+            update_customer,
+            delete_customer,
             render_receipt,
             validate_template
         ])
