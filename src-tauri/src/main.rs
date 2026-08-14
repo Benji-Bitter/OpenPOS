@@ -9,6 +9,23 @@ mod transaction;
 
 use database::Database;
 use database::models::{Transaction, TransactionItem, TransactionStatus};
+use receipt::engine::ReceiptEngine;
+use receipt::template::ReceiptTemplate;
+
+#[tauri::command]
+fn render_receipt(
+    template: ReceiptTemplate,
+    transaction: Transaction,
+) -> Result<String, String> {
+    let engine = ReceiptEngine::new();
+    engine.render_receipt(&template, &transaction)
+}
+
+#[tauri::command]
+fn validate_template(template: ReceiptTemplate) -> Result<(), String> {
+    let engine = ReceiptEngine::new();
+    engine.validate_template(&template)
+}
 
 fn main() {
     let db = Database::new(
@@ -20,6 +37,10 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(db)
+        .invoke_handler(tauri::generate_handler![
+            render_receipt,
+            validate_template
+        ])
         .setup(|_app| {
             println!("OpenPOS initialized successfully");
             Ok(())
