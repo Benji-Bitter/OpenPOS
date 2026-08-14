@@ -1,21 +1,18 @@
 use crate::database::models::{Transaction, TransactionItem, TransactionStatus};
 use crate::database::Database;
 use rusqlite::Result as SqliteResult;
-use std::sync::Arc;
-use tokio::sync::RwLock;
 
 pub struct TransactionManager {
-    db: Arc<RwLock<Database>>,
+    db: Database,
 }
 
 impl TransactionManager {
-    pub fn new(db: Arc<RwLock<Database>>) -> Self {
+    pub fn new(db: Database) -> Self {
         TransactionManager { db }
     }
 
-    pub async fn create_transaction(&self, transaction: Transaction) -> SqliteResult<Transaction> {
-        let db = self.db.read().await;
-        let conn = db.get_connection();
+    pub fn create_transaction(&self, transaction: Transaction) -> SqliteResult<Transaction> {
+        let conn = self.db.get_connection().lock().unwrap();
 
         conn.execute(
             "INSERT INTO transactions (
@@ -47,9 +44,8 @@ impl TransactionManager {
         Ok(created_transaction)
     }
 
-    pub async fn get_transaction(&self, transaction_id: &str) -> SqliteResult<Option<Transaction>> {
-        let db = self.db.read().await;
-        let conn = db.get_connection();
+    pub fn get_transaction(&self, transaction_id: &str) -> SqliteResult<Option<Transaction>> {
+        let conn = self.db.get_connection().lock().unwrap();
 
         let mut stmt = conn.prepare(
             "SELECT id, transaction_id, provider_transaction_id, amount_cents, currency,
@@ -84,13 +80,12 @@ impl TransactionManager {
         }
     }
 
-    pub async fn update_transaction_status(
+    pub fn update_transaction_status(
         &self,
         transaction_id: &str,
         new_status: TransactionStatus,
     ) -> SqliteResult<()> {
-        let db = self.db.write().await;
-        let conn = db.get_connection();
+        let conn = self.db.get_connection().lock().unwrap();
 
         conn.execute(
             "UPDATE transactions SET status = ?1, updated_at = strftime('%s', 'now') WHERE transaction_id = ?2",
@@ -100,9 +95,8 @@ impl TransactionManager {
         Ok(())
     }
 
-    pub async fn add_transaction_item(&self, item: TransactionItem) -> SqliteResult<TransactionItem> {
-        let db = self.db.write().await;
-        let conn = db.get_connection();
+    pub fn add_transaction_item(&self, item: TransactionItem) -> SqliteResult<TransactionItem> {
+        let conn = self.db.get_connection().lock().unwrap();
 
         conn.execute(
             "INSERT INTO transaction_items (
@@ -127,9 +121,8 @@ impl TransactionManager {
         Ok(created_item)
     }
 
-    pub async fn get_transaction_items(&self, transaction_id: i64) -> SqliteResult<Vec<TransactionItem>> {
-        let db = self.db.read().await;
-        let conn = db.get_connection();
+    pub fn get_transaction_items(&self, transaction_id: i64) -> SqliteResult<Vec<TransactionItem>> {
+        let conn = self.db.get_connection().lock().unwrap();
 
         let mut stmt = conn.prepare(
             "SELECT id, transaction_id, product_id, quantity, unit_price_cents,

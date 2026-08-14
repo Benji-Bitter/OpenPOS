@@ -1,23 +1,25 @@
 use rusqlite::{Connection, Result as SqliteResult};
 use std::path::PathBuf;
-use tauri::{AppHandle, Manager};
+use std::sync::{Arc, Mutex};
 
+#[derive(Clone)]
 pub struct Database {
-    conn: Connection,
+    conn: Arc<Mutex<Connection>>,
 }
 
 impl Database {
     pub fn new(db_path: PathBuf) -> SqliteResult<Self> {
         let conn = Connection::open(db_path)?;
-        Ok(Database { conn })
+        Ok(Database { conn: Arc::new(Mutex::new(conn)) })
     }
 
-    pub fn get_connection(&self) -> &Connection {
+    pub fn get_connection(&self) -> &Arc<Mutex<Connection>> {
         &self.conn
     }
 
-    pub fn migrate(&mut self) -> SqliteResult<()> {
-        self.conn.execute_batch(
+    pub fn migrate(&self) -> SqliteResult<()> {
+        let conn = self.conn.lock().unwrap();
+        conn.execute_batch(
             "BEGIN TRANSACTION;
              PRAGMA foreign_keys = ON;
              COMMIT;",
@@ -26,9 +28,6 @@ impl Database {
     }
 }
 
-pub fn get_database_path(app: &AppHandle) -> PathBuf {
-    app.path()
-        .app_data_dir()
-        .expect("Failed to get app data directory")
-        .join("openpos.db")
+pub fn get_database_path() -> PathBuf {
+    std::path::PathBuf::from("openpos.db")
 }

@@ -8,16 +8,19 @@ mod receipt;
 mod transaction;
 
 use database::Database;
-use database::get_database_path;
+use database::models::{Transaction, TransactionItem, TransactionStatus};
 
 fn main() {
+    let db = Database::new(
+        database::get_database_path()
+    ).expect("Failed to initialize database");
+    
+    db.migrate().expect("Failed to run migrations");
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .setup(|app| {
-            let db_path = get_database_path(app.handle());
-            let db = Database::new(db_path).expect("Failed to initialize database");
-            database::run_migrations(db.get_connection()).expect("Failed to run migrations");
-            
+        .manage(db)
+        .setup(|_app| {
             println!("OpenPOS initialized successfully");
             Ok(())
         })
