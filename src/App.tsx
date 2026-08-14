@@ -1,115 +1,123 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import POSInterface from './components/pos/POSInterface';
 import TransactionHistory from './components/transactions/TransactionHistory';
+import ProductManagement from './components/products/ProductManagement';
 import { Product, Category, Transaction } from './types';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   
-  // Sample data for development
-  const sampleProducts: Product[] = [
-    {
-      id: 1,
-      name: 'Coffee',
-      description: 'Fresh brewed coffee',
-      price_cents: 450,
-      category_id: 1,
-      sku: 'COF001',
-      tax_rate_cents: 36,
-      stock_quantity: 50,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 2,
-      name: 'Sandwich',
-      description: 'Club sandwich',
-      price_cents: 900,
-      category_id: 1,
-      sku: 'SND001',
-      tax_rate_cents: 72,
-      stock_quantity: 25,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 3,
-      name: 'Salad',
-      description: 'Caesar salad',
-      price_cents: 750,
-      category_id: 1,
-      sku: 'SAL001',
-      tax_rate_cents: 60,
-      stock_quantity: 30,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 4,
-      name: 'Pizza Slice',
-      description: 'Pepperoni slice',
-      price_cents: 350,
-      category_id: 1,
-      sku: 'PIZ001',
-      tax_rate_cents: 28,
-      stock_quantity: 40,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 5,
-      name: 'Burger',
-      description: 'Classic cheeseburger',
-      price_cents: 850,
-      category_id: 1,
-      sku: 'BUR001',
-      tax_rate_cents: 68,
-      stock_quantity: 20,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 6,
-      name: 'Soda',
-      description: 'Coca-Cola',
-      price_cents: 200,
-      category_id: 2,
-      sku: 'DRK001',
-      tax_rate_cents: 16,
-      stock_quantity: 100,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 7,
-      name: 'Water',
-      description: 'Bottled water',
-      price_cents: 150,
-      category_id: 2,
-      sku: 'DRK002',
-      tax_rate_cents: 12,
-      stock_quantity: 75,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-    {
-      id: 8,
-      name: 'Juice',
-      description: 'Orange juice',
-      price_cents: 300,
-      category_id: 2,
-      sku: 'DRK003',
-      tax_rate_cents: 24,
-      stock_quantity: 45,
-      created_at: Date.now(),
-      updated_at: Date.now(),
-    },
-  ];
-
-  const sampleCategories: Category[] = [
-    { id: 1, name: 'Food', created_at: Date.now(), updated_at: Date.now() },
-    { id: 2, name: 'Drinks', created_at: Date.now(), updated_at: Date.now() },
-  ];
+  // Initialize with sample data
+  useEffect(() => {
+    if (products.length === 0) {
+      setProducts([
+        {
+          id: 1,
+          name: 'Coffee',
+          description: 'Fresh brewed coffee',
+          price_cents: 450,
+          category_id: 1,
+          sku: 'COF001',
+          tax_rate_cents: 36,
+          stock_quantity: 50,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 2,
+          name: 'Sandwich',
+          description: 'Club sandwich',
+          price_cents: 900,
+          category_id: 1,
+          sku: 'SND001',
+          tax_rate_cents: 72,
+          stock_quantity: 25,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 3,
+          name: 'Salad',
+          description: 'Caesar salad',
+          price_cents: 750,
+          category_id: 1,
+          sku: 'SAL001',
+          tax_rate_cents: 60,
+          stock_quantity: 30,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 4,
+          name: 'Pizza Slice',
+          description: 'Pepperoni slice',
+          price_cents: 350,
+          category_id: 1,
+          sku: 'PIZ001',
+          tax_rate_cents: 28,
+          stock_quantity: 40,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 5,
+          name: 'Burger',
+          description: 'Classic cheeseburger',
+          price_cents: 850,
+          category_id: 1,
+          sku: 'BUR001',
+          tax_rate_cents: 68,
+          stock_quantity: 20,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 6,
+          name: 'Soda',
+          description: 'Coca-Cola',
+          price_cents: 200,
+          category_id: 2,
+          sku: 'DRK001',
+          tax_rate_cents: 16,
+          stock_quantity: 100,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 7,
+          name: 'Water',
+          description: 'Bottled water',
+          price_cents: 150,
+          category_id: 2,
+          sku: 'DRK002',
+          tax_rate_cents: 12,
+          stock_quantity: 75,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+        {
+          id: 8,
+          name: 'Juice',
+          description: 'Orange juice',
+          price_cents: 300,
+          category_id: 2,
+          sku: 'DRK003',
+          tax_rate_cents: 24,
+          stock_quantity: 45,
+          created_at: Date.now(),
+          updated_at: Date.now(),
+        },
+      ]);
+    }
+    if (categories.length === 0) {
+      setCategories([
+        { id: 1, name: 'Food', created_at: Date.now(), updated_at: Date.now() },
+        { id: 2, name: 'Drinks', created_at: Date.now(), updated_at: Date.now() },
+      ]);
+    }
+  }, []);
 
   const sampleTransactions: Transaction[] = [
     {
@@ -249,15 +257,23 @@ function App() {
         <div className="flex-1 bg-gray-50 dark:bg-gray-900">
           {currentView === 'pos' && (
             <POSInterface 
-              products={sampleProducts}
-              categories={sampleCategories}
+              products={products}
+              categories={categories}
               discountsEnabled={true}
             />
           )}
           {currentView === 'transactions' && (
             <TransactionHistory transactions={sampleTransactions} />
           )}
-          {currentView !== 'pos' && currentView !== 'transactions' && (
+          {currentView === 'products' && (
+            <ProductManagement 
+              products={products}
+              categories={categories}
+              onUpdateProducts={setProducts}
+              onUpdateCategories={setCategories}
+            />
+          )}
+          {currentView !== 'pos' && currentView !== 'transactions' && currentView !== 'products' && (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold mb-2 capitalize">{currentView}</h2>
