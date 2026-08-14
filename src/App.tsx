@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Product, Category } from './types';
+import PremiumPOS from './components/pos/PremiumPOS';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
@@ -193,35 +194,40 @@ function App() {
         
         {/* Content Area */}
         <div className="flex-1 overflow-auto p-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
-              <h2 className="text-3xl font-semibold text-text-primary mb-2 capitalize">{currentView}</h2>
-              <p className="text-text-secondary">
-                {currentView === 'pos' && 'Process sales and manage orders'}
-                {currentView === 'transactions' && 'View and manage transaction history'}
-                {currentView === 'products' && 'Manage your product catalog'}
-                {currentView === 'inventory' && 'Track stock levels and adjustments'}
-                {currentView === 'customers' && 'Manage customer information'}
-                {currentView === 'devices' && 'Configure hardware devices'}
-                {currentView === 'printers' && 'Manage receipt printers'}
-                {currentView === 'receipts' && 'Design receipt templates'}
-                {currentView === 'payments' && 'Configure payment providers'}
-                {currentView === 'reports' && 'View sales analytics'}
-                {currentView === 'settings' && 'Configure application settings'}
-              </p>
-            </div>
+          <div className="max-w-7xl mx-auto h-full flex flex-col">
+            {currentView === 'pos' ? (
+              <PremiumPOS products={products} categories={categories} />
+            ) : (
+              <>
+                <div className="mb-8">
+                  <h2 className="text-3xl font-semibold text-text-primary mb-2 capitalize">{currentView}</h2>
+                  <p className="text-text-secondary">
+                    {currentView === 'transactions' && 'View and manage transaction history'}
+                    {currentView === 'products' && 'Manage your product catalog'}
+                    {currentView === 'inventory' && 'Track stock levels and adjustments'}
+                    {currentView === 'customers' && 'Manage customer information'}
+                    {currentView === 'devices' && 'Configure hardware devices'}
+                    {currentView === 'printers' && 'Manage receipt printers'}
+                    {currentView === 'receipts' && 'Design receipt templates'}
+                    {currentView === 'payments' && 'Configure payment providers'}
+                    {currentView === 'reports' && 'View sales analytics'}
+                    {currentView === 'settings' && 'Configure application settings'}
+                  </p>
+                </div>
 
-            {/* Feature Coming Soon */}
-            <div className="glass rounded-2xl p-12 text-center">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-surface-secondary flex items-center justify-center">
-                <span className="text-4xl">🚧</span>
-              </div>
-              <h3 className="text-xl font-semibold text-text-primary mb-2">Under Construction</h3>
-              <p className="text-text-secondary max-w-md mx-auto">
-                This feature is being implemented with the new premium design system. 
-                Check back soon for updates.
-              </p>
-            </div>
+                {/* Feature Coming Soon */}
+                <div className="glass rounded-2xl p-12 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-surface-secondary flex items-center justify-center">
+                    <span className="text-4xl">🚧</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-text-primary mb-2">Under Construction</h3>
+                  <p className="text-text-secondary max-w-md mx-auto">
+                    This feature is being implemented with the new premium design system. 
+                    Check back soon for updates.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </main>
