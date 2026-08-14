@@ -18,8 +18,8 @@ impl TransactionManager {
             "INSERT INTO transactions (
                 transaction_id, provider_transaction_id, amount_cents, currency,
                 payment_provider, payment_method, status, terminal_id, customer_id,
-                tax_cents, discount_cents, subtotal_cents, receipt_data
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+                tax_cents, discount_cents, subtotal_cents, receipt_data, cashier_id
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             [
                 &transaction.transaction_id,
                 transaction.provider_transaction_id.as_deref().unwrap_or(""),
@@ -34,6 +34,7 @@ impl TransactionManager {
                 &(transaction.discount_cents.to_string()),
                 &(transaction.subtotal_cents.to_string()),
                 transaction.receipt_data.as_deref().unwrap_or(""),
+                transaction.cashier_id.as_deref().unwrap_or(""),
             ],
         )?;
 
@@ -50,7 +51,7 @@ impl TransactionManager {
         let mut stmt = conn.prepare(
             "SELECT id, transaction_id, provider_transaction_id, amount_cents, currency,
                     payment_provider, payment_method, status, terminal_id, customer_id,
-                    tax_cents, discount_cents, subtotal_cents, receipt_data, created_at, updated_at
+                    tax_cents, discount_cents, subtotal_cents, receipt_data, cashier_id, created_at, updated_at
              FROM transactions WHERE transaction_id = ?1",
         )?;
 
@@ -72,8 +73,9 @@ impl TransactionManager {
                 discount_cents: row.get(11)?,
                 subtotal_cents: row.get(12)?,
                 receipt_data: row.get(13)?,
-                created_at: row.get(14)?,
-                updated_at: row.get(15)?,
+                cashier_id: row.get(14)?,
+                created_at: row.get(15)?,
+                updated_at: row.get(16)?,
             }))
         } else {
             Ok(None)

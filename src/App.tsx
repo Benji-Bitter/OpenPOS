@@ -15,6 +15,7 @@ function App() {
       category_id: 1,
       sku: 'COF001',
       tax_rate_cents: 36,
+      stock_quantity: 50,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -26,6 +27,7 @@ function App() {
       category_id: 1,
       sku: 'SND001',
       tax_rate_cents: 72,
+      stock_quantity: 25,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -37,6 +39,7 @@ function App() {
       category_id: 1,
       sku: 'SAL001',
       tax_rate_cents: 60,
+      stock_quantity: 30,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -48,6 +51,7 @@ function App() {
       category_id: 1,
       sku: 'PIZ001',
       tax_rate_cents: 28,
+      stock_quantity: 40,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -59,6 +63,7 @@ function App() {
       category_id: 1,
       sku: 'BUR001',
       tax_rate_cents: 68,
+      stock_quantity: 20,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -70,6 +75,7 @@ function App() {
       category_id: 2,
       sku: 'DRK001',
       tax_rate_cents: 16,
+      stock_quantity: 100,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -81,6 +87,7 @@ function App() {
       category_id: 2,
       sku: 'DRK002',
       tax_rate_cents: 12,
+      stock_quantity: 75,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -92,6 +99,7 @@ function App() {
       category_id: 2,
       sku: 'DRK003',
       tax_rate_cents: 24,
+      stock_quantity: 45,
       created_at: Date.now(),
       updated_at: Date.now(),
     },
@@ -200,6 +208,7 @@ function App() {
               products={sampleProducts}
               categories={sampleCategories}
               onCheckout={handleCheckout}
+              discountsEnabled={true}
             />
           )}
           {currentView !== 'pos' && (

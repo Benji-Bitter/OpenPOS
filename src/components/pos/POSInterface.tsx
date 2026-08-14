@@ -6,12 +6,14 @@ interface POSInterfaceProps {
   products: Product[];
   categories: Category[];
   onCheckout: (cart: CartItem[], total: number) => void;
+  discountsEnabled?: boolean;
 }
 
-export default function POSInterface({ products, categories, onCheckout }: POSInterfaceProps) {
+export default function POSInterface({ products, categories, onCheckout, discountsEnabled = false }: POSInterfaceProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === null || product.category_id === selectedCategory;
@@ -55,7 +57,8 @@ export default function POSInterface({ products, categories, onCheckout }: POSIn
 
   const subtotal = cart.reduce((sum, item) => sum + (item.product.price_cents * item.quantity), 0);
   const tax = cart.reduce((sum, item) => sum + (item.product.tax_rate_cents * item.quantity), 0);
-  const total = subtotal + tax;
+  const discount = discountAmount * 100; // Convert to cents
+  const total = Math.max(0, subtotal + tax - discount);
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
@@ -111,6 +114,7 @@ export default function POSInterface({ products, categories, onCheckout }: POSIn
                 key={product.id}
                 product={product}
                 onAddToCart={addToCart}
+                stock={product.stock_quantity || 0}
               />
             ))}
           </div>
@@ -132,43 +136,56 @@ export default function POSInterface({ products, categories, onCheckout }: POSIn
         <div className="flex-1 overflow-y-auto p-4">
           {cart.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              Cart is empty
+              <div className="text-4xl mb-2">🛒</div>
+              <p>Cart is empty</p>
+              <p className="text-sm mt-1">Add items to get started</p>
             </div>
           ) : (
             <div className="space-y-3">
               {cart.map(item => (
                 <div
                   key={item.product.id}
-                  className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
                 >
+                  <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-md flex items-center justify-center flex-shrink-0">
+                    <span className="text-xl">📦</span>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 dark:text-gray-100 truncate">
                       {item.product.name}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      ${(item.product.price_cents / 100).toFixed(2)}
+                      ${(item.product.price_cents / 100).toFixed(2)} each
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(item.product.id!, item.quantity - 1)}
-                      className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500"
+                      className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                     >
                       -
                     </button>
-                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <span className="w-8 text-center font-semibold">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.product.id!, item.quantity + 1)}
-                      className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500"
+                      className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center"
                     >
                       +
                     </button>
                   </div>
+                  <div className="text-right min-w-[80px]">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                      ${((item.product.price_cents * item.quantity) / 100).toFixed(2)}
+                    </p>
+                  </div>
                   <button
                     onClick={() => removeFromCart(item.product.id!)}
-                    className="text-red-500 hover:text-red-600 p-1"
+                    className="text-red-500 hover:text-red-600 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    title="Remove item"
                   >
-                    ×
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 </div>
               ))}
@@ -187,18 +204,49 @@ export default function POSInterface({ products, categories, onCheckout }: POSIn
               <span className="text-gray-600 dark:text-gray-400">Tax</span>
               <span className="font-medium">${(tax / 100).toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-lg font-semibold">
+            {discountsEnabled && (
+              <div className="flex justify-between text-sm items-center">
+                <span className="text-gray-600 dark:text-gray-400">Discount</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={discountAmount}
+                    onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                    className="w-20 px-2 py-1 text-right border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                  <span className="font-medium text-red-600 dark:text-red-400">
+                    -${(discount / 100).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200 dark:border-gray-700">
               <span>Total</span>
               <span>${(total / 100).toFixed(2)}</span>
             </div>
           </div>
-          <button
-            onClick={handleCheckout}
-            disabled={cart.length === 0}
-            className="w-full py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
-          >
-            Checkout
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setCart([]);
+                setDiscountAmount(0);
+              }}
+              disabled={cart.length === 0}
+              className="flex-1 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Clear
+            </button>
+            <button
+              onClick={handleCheckout}
+              disabled={cart.length === 0}
+              className="flex-1 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+            >
+              Checkout
+            </button>
+          </div>
         </div>
       </div>
     </div>

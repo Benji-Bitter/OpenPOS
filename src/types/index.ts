@@ -7,6 +7,7 @@ export interface Product {
   sku?: string;
   barcode?: string;
   tax_rate_cents: number;
+  stock_quantity?: number;
   created_at: number;
   updated_at: number;
 }

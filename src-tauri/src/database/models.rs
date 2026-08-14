@@ -40,6 +40,7 @@ pub struct Transaction {
     pub discount_cents: i64,
     pub subtotal_cents: i64,
     pub receipt_data: Option<String>,
+    pub cashier_id: Option<String>,
     pub created_at: i64,
     pub updated_at: i64,
 }

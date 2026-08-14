@@ -15,6 +15,7 @@ pub fn run_migrations(conn: &Connection) -> SqliteResult<()> {
             sku TEXT UNIQUE,
             barcode TEXT,
             tax_rate_cents INTEGER DEFAULT 0,
+            stock_quantity INTEGER DEFAULT 0,
             created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
             updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
             FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
@@ -53,6 +54,7 @@ pub fn run_migrations(conn: &Connection) -> SqliteResult<()> {
             discount_cents INTEGER DEFAULT 0,
             subtotal_cents INTEGER NOT NULL,
             receipt_data TEXT,
+            cashier_id TEXT,
             created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
             updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
             FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
