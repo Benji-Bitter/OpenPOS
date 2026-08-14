@@ -20,7 +20,7 @@ export default function ProductCard({ product, onAddToCart, stock = 0 }: Product
         }`}
     >
       <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-md mb-3 flex items-center justify-center overflow-hidden">
-        <span className="text-4xl group-hover:scale-110 transition-transform">📦</span>
+        <span className="text-4xl group-hover:scale-110 transition-transform">Box</span>
       </div>
       <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 truncate">{product.name}</h3>
       <p className="text-lg font-bold text-primary-600 dark:text-primary-400 mb-2">

@@ -208,7 +208,7 @@ export default function CheckoutModal({
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
-                <div className="text-2xl mb-2">💳</div>
+                <div className="text-2xl mb-2">Card</div>
                 <div className="font-medium text-gray-900 dark:text-gray-100">Card</div>
               </button>
               <button

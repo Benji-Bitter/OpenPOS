@@ -95,7 +95,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
       <div className="flex-1 overflow-auto p-6">
         {filteredTransactions.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-4xl mb-2">📋</div>
+            <div className="text-4xl mb-2">List</div>
             <p className="text-gray-500 dark:text-gray-400">
               {transactions.length === 0 ? 'No transactions yet' : 'No transactions match your filters'}
             </p>

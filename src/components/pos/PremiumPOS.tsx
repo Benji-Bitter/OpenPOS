@@ -114,7 +114,11 @@ export default function PremiumPOS({ products, categories }: PremiumPOSProps) {
                   }`}
                 >
                   <div className="aspect-square bg-gradient-to-br from-surface-secondary to-surface-primary rounded-xl mb-4 flex items-center justify-center">
-                    <span className="text-4xl">📦</span>
+                    <div className="w-12 h-12 bg-surface-primary rounded-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-primary-500">
+                        {product.name.charAt(0)}
+                      </span>
+                    </div>
                   </div>
                   <h3 className="font-semibold text-text-primary mb-1 truncate">{product.name}</h3>
                   <p className="text-lg font-bold text-primary-500 mb-2">
@@ -146,7 +150,9 @@ export default function PremiumPOS({ products, categories }: PremiumPOSProps) {
           {cart.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-surface-secondary flex items-center justify-center">
-                <span className="text-3xl">🛒</span>
+                <svg className="w-8 h-8 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
               </div>
               <p className="text-text-secondary">Cart is empty</p>
               <p className="text-sm text-text-secondary mt-1">Add items to get started</p>
@@ -159,7 +165,9 @@ export default function PremiumPOS({ products, categories }: PremiumPOSProps) {
                   className="glass-strong rounded-xl p-4 flex items-center gap-3"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-surface-secondary to-surface-primary rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">📦</span>
+                    <span className="text-xl font-bold text-primary-500">
+                      {item.product.name.charAt(0)}
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-text-primary truncate">{item.product.name}</p>

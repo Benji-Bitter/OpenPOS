@@ -169,17 +169,17 @@ function App() {
   ];
 
   const navItems = [
-    { id: 'pos', label: 'POS', icon: '🛒' },
-    { id: 'transactions', label: 'Transactions', icon: '📋' },
-    { id: 'products', label: 'Products', icon: '📦' },
-    { id: 'inventory', label: 'Inventory', icon: '📊' },
-    { id: 'customers', label: 'Customers', icon: '👥' },
-    { id: 'devices', label: 'Devices', icon: '🔌' },
-    { id: 'printers', label: 'Printers', icon: '🖨️' },
-    { id: 'receipts', label: 'Receipts', icon: '🧾' },
-    { id: 'payments', label: 'Payments', icon: '💳' },
-    { id: 'reports', label: 'Reports', icon: '📈' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'pos', label: 'POS' },
+    { id: 'transactions', label: 'Transactions' },
+    { id: 'products', label: 'Products' },
+    { id: 'inventory', label: 'Inventory' },
+    { id: 'customers', label: 'Customers' },
+    { id: 'devices', label: 'Devices' },
+    { id: 'printers', label: 'Printers' },
+    { id: 'receipts', label: 'Receipts' },
+    { id: 'payments', label: 'Payments' },
+    { id: 'reports', label: 'Reports' },
+    { id: 'settings', label: 'Settings' },
   ];
 
   return (
@@ -229,7 +229,6 @@ function App() {
                     : 'text-text-secondary hover:bg-surface-secondary hover:text-text-primary'
                 }`}
               >
-                <span className="text-base">{item.icon}</span>
                 <span>{item.label}</span>
               </button>
             ))}

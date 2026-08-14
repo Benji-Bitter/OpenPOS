@@ -115,7 +115,7 @@ export default function PremiumInventory({
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-surface-secondary flex items-center justify-center">
-                <span className="text-4xl">📦</span>
+                <span className="text-4xl">Box</span>
               </div>
               <p className="text-text-secondary">
                 {products.length === 0 ? 'No products in inventory' : 'No products match your filters'}

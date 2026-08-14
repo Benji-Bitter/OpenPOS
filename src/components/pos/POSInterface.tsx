@@ -142,7 +142,7 @@ export default function POSInterface({ products, categories, discountsEnabled = 
         <div className="flex-1 overflow-y-auto p-4">
           {cart.length === 0 ? (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <div className="text-4xl mb-2">🛒</div>
+              <div className="text-4xl mb-2">Cart</div>
               <p>Cart is empty</p>
               <p className="text-sm mt-1">Add items to get started</p>
             </div>
@@ -154,7 +154,7 @@ export default function POSInterface({ products, categories, discountsEnabled = 
                   className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 transition-colors"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-md flex items-center justify-center flex-shrink-0">
-                    <span className="text-xl">📦</span>
+                    <span className="text-xl">Box</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 dark:text-gray-100 truncate">

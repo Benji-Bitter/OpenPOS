@@ -144,7 +144,7 @@ export default function ProductManagement({
         {activeTab === 'products' ? (
           filteredProducts.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-4xl mb-2">📦</div>
+              <div className="text-4xl mb-2">Box</div>
               <p className="text-gray-500 dark:text-gray-400">
                 {products.length === 0 ? 'No products yet' : 'No products match your filters'}
               </p>
