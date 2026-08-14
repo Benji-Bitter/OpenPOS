@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Product, Category } from './types';
+import { Product, Category, Transaction } from './types';
 import PremiumPOS from './components/pos/PremiumPOS';
+import PremiumTransactions from './components/transactions/PremiumTransactions';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
@@ -117,6 +118,54 @@ function App() {
     }
   }, []);
 
+  const sampleTransactions: Transaction[] = [
+    {
+      transaction_id: 'txn_1234567890_abc123',
+      provider_transaction_id: 'provider_1234567890',
+      amount_cents: 1350,
+      currency: 'USD',
+      payment_provider: 'OpenPOS',
+      payment_method: 'Cash',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 108,
+      discount_cents: 0,
+      subtotal_cents: 1242,
+      created_at: Math.floor(Date.now() / 1000) - 3600,
+      updated_at: Math.floor(Date.now() / 1000) - 3600,
+    },
+    {
+      transaction_id: 'txn_1234567891_def456',
+      provider_transaction_id: 'provider_1234567891',
+      amount_cents: 900,
+      currency: 'USD',
+      payment_provider: 'Stripe',
+      payment_method: 'Card',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 72,
+      discount_cents: 0,
+      subtotal_cents: 828,
+      created_at: Math.floor(Date.now() / 1000) - 7200,
+      updated_at: Math.floor(Date.now() / 1000) - 7200,
+    },
+    {
+      transaction_id: 'txn_1234567892_ghi789',
+      provider_transaction_id: 'provider_1234567892',
+      amount_cents: 2500,
+      currency: 'USD',
+      payment_provider: 'OpenPOS',
+      payment_method: 'Cash',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 200,
+      discount_cents: 500,
+      subtotal_cents: 2800,
+      created_at: Math.floor(Date.now() / 1000) - 86400,
+      updated_at: Math.floor(Date.now() / 1000) - 86400,
+    },
+  ];
+
   const navItems = [
     { id: 'pos', label: 'POS', icon: '🛒' },
     { id: 'transactions', label: 'Transactions', icon: '📋' },
@@ -197,12 +246,13 @@ function App() {
           <div className="max-w-7xl mx-auto h-full flex flex-col">
             {currentView === 'pos' ? (
               <PremiumPOS products={products} categories={categories} />
+            ) : currentView === 'transactions' ? (
+              <PremiumTransactions transactions={sampleTransactions} />
             ) : (
               <>
                 <div className="mb-8">
                   <h2 className="text-3xl font-semibold text-text-primary mb-2 capitalize">{currentView}</h2>
                   <p className="text-text-secondary">
-                    {currentView === 'transactions' && 'View and manage transaction history'}
                     {currentView === 'products' && 'Manage your product catalog'}
                     {currentView === 'inventory' && 'Track stock levels and adjustments'}
                     {currentView === 'customers' && 'Manage customer information'}
