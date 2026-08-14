@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import POSInterface from './components/pos/POSInterface';
-import { Product, CartItem, Category } from './types';
+import { Product, Category } from './types';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
@@ -110,11 +110,6 @@ function App() {
     { id: 2, name: 'Drinks', created_at: Date.now(), updated_at: Date.now() },
   ];
 
-  const handleCheckout = (cart: CartItem[], total: number) => {
-    console.log('Checkout:', { cart, total });
-    alert(`Checkout: ${(total / 100).toFixed(2)} with ${cart.length} items`);
-  };
-
   return (
     <div className="h-screen w-screen flex flex-col">
       <header className="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 bg-white dark:bg-gray-950">
@@ -207,7 +202,6 @@ function App() {
             <POSInterface 
               products={sampleProducts}
               categories={sampleCategories}
-              onCheckout={handleCheckout}
               discountsEnabled={true}
             />
           )}

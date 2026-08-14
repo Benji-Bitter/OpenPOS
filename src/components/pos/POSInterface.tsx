@@ -1,19 +1,20 @@
 import { useState } from 'react';
-import { Product, CartItem, Category } from '@/types';
+import { Product, CartItem, Category, Transaction } from '@/types';
 import ProductCard from './ProductCard';
+import CheckoutModal from './CheckoutModal';
 
 interface POSInterfaceProps {
   products: Product[];
   categories: Category[];
-  onCheckout: (cart: CartItem[], total: number) => void;
   discountsEnabled?: boolean;
 }
 
-export default function POSInterface({ products, categories, onCheckout, discountsEnabled = false }: POSInterfaceProps) {
+export default function POSInterface({ products, categories, discountsEnabled = false }: POSInterfaceProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === null || product.category_id === selectedCategory;
@@ -62,8 +63,13 @@ export default function POSInterface({ products, categories, onCheckout, discoun
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    onCheckout(cart, total);
+    setShowCheckout(true);
+  };
+
+  const handleCompleteTransaction = (_transaction: Transaction) => {
+    setShowCheckout(false);
     setCart([]);
+    setDiscountAmount(0);
   };
 
   return (
@@ -249,6 +255,17 @@ export default function POSInterface({ products, categories, onCheckout, discoun
           </div>
         </div>
       </div>
+
+      <CheckoutModal
+        isOpen={showCheckout}
+        onClose={() => setShowCheckout(false)}
+        cart={cart}
+        subtotal={subtotal}
+        tax={tax}
+        discount={discount}
+        total={total}
+        onComplete={handleCompleteTransaction}
+      />
     </div>
   );
 }
