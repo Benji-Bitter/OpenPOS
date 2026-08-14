@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import POSInterface from './components/pos/POSInterface';
-import { Product, Category } from './types';
+import TransactionHistory from './components/transactions/TransactionHistory';
+import { Product, Category, Transaction } from './types';
 
 function App() {
   const [currentView, setCurrentView] = useState('pos');
@@ -110,6 +111,54 @@ function App() {
     { id: 2, name: 'Drinks', created_at: Date.now(), updated_at: Date.now() },
   ];
 
+  const sampleTransactions: Transaction[] = [
+    {
+      transaction_id: 'txn_1234567890_abc123',
+      provider_transaction_id: 'provider_1234567890',
+      amount_cents: 1350,
+      currency: 'USD',
+      payment_provider: 'OpenPOS',
+      payment_method: 'Cash',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 108,
+      discount_cents: 0,
+      subtotal_cents: 1242,
+      created_at: Math.floor(Date.now() / 1000) - 3600,
+      updated_at: Math.floor(Date.now() / 1000) - 3600,
+    },
+    {
+      transaction_id: 'txn_1234567891_def456',
+      provider_transaction_id: 'provider_1234567891',
+      amount_cents: 900,
+      currency: 'USD',
+      payment_provider: 'Stripe',
+      payment_method: 'Card',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 72,
+      discount_cents: 0,
+      subtotal_cents: 828,
+      created_at: Math.floor(Date.now() / 1000) - 7200,
+      updated_at: Math.floor(Date.now() / 1000) - 7200,
+    },
+    {
+      transaction_id: 'txn_1234567892_ghi789',
+      provider_transaction_id: 'provider_1234567892',
+      amount_cents: 2500,
+      currency: 'USD',
+      payment_provider: 'OpenPOS',
+      payment_method: 'Cash',
+      status: 'completed',
+      terminal_id: 'terminal-1',
+      tax_cents: 200,
+      discount_cents: 500,
+      subtotal_cents: 2800,
+      created_at: Math.floor(Date.now() / 1000) - 86400,
+      updated_at: Math.floor(Date.now() / 1000) - 86400,
+    },
+  ];
+
   return (
     <div className="h-screen w-screen flex flex-col">
       <header className="h-14 border-b border-gray-200 dark:border-gray-800 flex items-center px-6 bg-white dark:bg-gray-950">
@@ -205,7 +254,10 @@ function App() {
               discountsEnabled={true}
             />
           )}
-          {currentView !== 'pos' && (
+          {currentView === 'transactions' && (
+            <TransactionHistory transactions={sampleTransactions} />
+          )}
+          {currentView !== 'pos' && currentView !== 'transactions' && (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold mb-2 capitalize">{currentView}</h2>

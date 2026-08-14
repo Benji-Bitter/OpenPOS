@@ -17,8 +17,8 @@ export interface Category {
   name: string;
   description?: string;
   parent_id?: number;
-  created_at?: number;
-  updated_at?: number;
+  created_at: number;
+  updated_at: number;
 }
 
 export interface CartItem {
@@ -41,6 +41,7 @@ export interface Transaction {
   discount_cents: number;
   subtotal_cents: number;
   receipt_data?: string;
+  cashier_id?: string;
   created_at: number;
   updated_at: number;
 }
