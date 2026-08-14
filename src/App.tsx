@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import POSInterface from './components/pos/POSInterface';
 import TransactionHistory from './components/transactions/TransactionHistory';
 import ProductManagement from './components/products/ProductManagement';
+import InventoryScreen from './components/inventory/InventoryScreen';
 import { Product, Category, Transaction } from './types';
 
 function App() {
@@ -273,7 +274,14 @@ function App() {
               onUpdateCategories={setCategories}
             />
           )}
-          {currentView !== 'pos' && currentView !== 'transactions' && currentView !== 'products' && (
+          {currentView === 'inventory' && (
+            <InventoryScreen 
+              products={products}
+              categories={categories}
+              onUpdateProducts={setProducts}
+            />
+          )}
+          {currentView !== 'pos' && currentView !== 'transactions' && currentView !== 'products' && currentView !== 'inventory' && (
             <div className="h-full flex items-center justify-center">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold mb-2 capitalize">{currentView}</h2>
